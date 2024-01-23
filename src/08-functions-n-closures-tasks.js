@@ -110,8 +110,17 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return () => {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        return func();
+      } catch (error) {
+        // console.error(error.message);
+      }
+    }
+    throw new Error();
+  };
 }
 
 
@@ -138,8 +147,28 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+// function logger(func, logFunc) {
+//   const log = [];
+//   return (...args) => {
+//     const calls = [];
+//     calls.push(logFunc(`${func.name}(${args}) starts`));
+//     calls.push(logFunc(`${func.name}(${args}) ends`));
+//     log.push(calls);
+//     return func(args);
+//   };
+// }
+
+function logger(func, logFunc) {
+  const mainLog = [];
+
+  return function recorder(...arg) {
+    const call = [];
+    call.push(logFunc(`${func.name}(${arg}) starts`));
+    call.push(logFunc(`${func.name}(${arg}) ends`));
+    mainLog.push(call);
+
+    return func(arg);
+  };
 }
 
 
@@ -156,8 +185,19 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(...args) {
+  let secondLevelString = '';
+
+  for (let i = 1; i < arguments.length; i += 1) {
+    secondLevelString += args[i];
+  }
+
+  return function allArg(...arg) {
+    for (let i = 0; i < arguments.length; i += 1) {
+      secondLevelString += arg[i];
+    }
+    return secondLevelString;
+  };
 }
 
 
